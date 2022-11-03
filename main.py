@@ -4,7 +4,7 @@ import pandas
 from sklearn import datasets, linear_model, metrics
   
 # load the boston dataset
-boston = pandas.readcdv
+boston = pandas.readcdv('cars.csv')
   
 # defining feature matrix(X) and response vector(y)
 X = boston.data
