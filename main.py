@@ -1,53 +1,43 @@
-import matplotlib.pyplot as plt
 import numpy as np
-import pandas
-from sklearn import datasets, linear_model, metrics
-  
-# load the boston dataset
-boston = pandas.readcdv('cars.csv')
-  
-# defining feature matrix(X) and response vector(y)
-X = boston.data
-y = boston.target
-  
-# splitting X and y into training and testing sets
+import pandas as pd
+import matplotlib.pyplot as plt
+
+
+df = pd.read_csv('cars.csv')
+
+
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder
+labelencoder_X = LabelEncoder()
+df['Number of doors'] = labelencoder_X.fit_transform(df['Number of doors'])
+enc = OneHotEncoder(handle_unknown='ignore')
+enc_df = pd.DataFrame(enc.fit_transform(df[['Drive type']]).toarray())
+df = df.drop(['Drive type'], axis=1)
+
+for i in range(3):
+    df.insert(3 + i,i, enc_df[i])
+
+X = df.iloc[:, 1:-1].values
+Y = df.iloc[:, 9].values
+print(Y)
+
 from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4,
-                                                    random_state=1)
-  
-# create linear regression object
-reg = linear_model.LinearRegression()
-  
-# train the model using the training sets
-reg.fit(X_train, y_train)
-  
-# regression coefficients
-print('Coefficients: ', reg.coef_)
-  
-# variance score: 1 means perfect prediction
-print('Variance score: {}'.format(reg.score(X_test, y_test)))
-  
-# plot for residual error
-  
-## setting plot style
-plt.style.use('fivethirtyeight')
-  
-## plotting residual errors in training data
-plt.scatter(reg.predict(X_train), reg.predict(X_train) - y_train,
-            color = "green", s = 10, label = 'Train data')
-  
-## plotting residual errors in test data
-plt.scatter(reg.predict(X_test), reg.predict(X_test) - y_test,
-            color = "blue", s = 10, label = 'Test data')
-  
-## plotting line for zero residual error
-plt.hlines(y = 0, xmin = 0, xmax = 50, linewidth = 2)
-  
-## plotting legend
+X_Train, X_Test, Y_Train, Y_Test = train_test_split(X, Y, test_size = 0.2, random_state = 0)
+
+from sklearn.linear_model import LinearRegression
+reg = LinearRegression()
+reg.fit(X_Train, Y_Train)
+
+Y_Pred = regressor.predict(X_Test)
+
+from sklearn.metrics import mean_squared_error, mean_absolute_error
+mse = mean_squared_error(Y_Test, Y_Pred)
+mae = mean_absolute_error(Y_Test,Y_Pred)
+print("Mean Square Error : ", mse)
+print("Mean Absolute Error : ", mae)
+print("Accuracy percentage : ", 100 - mae*100 / np.average(Y_Test))
+
+plt.scatter(reg.predict(X_Test), reg.predict(X_Test) - Y_Test, color = "blue", s = 10, label = 'Test data')
 plt.legend(loc = 'upper right')
-  
-## plot title
 plt.title("Residual errors")
-  
-## method call for showing the plot
 plt.show()
+    
